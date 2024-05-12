@@ -2,13 +2,32 @@ use super::status::{HttpStatus, HttpStatusErr};
 
 enum Route {
     Root,
+    Echo(String),
     NotFound,
 }
 
 impl Route {
     pub fn get_from_path(path: &str) -> Self {
-        match path {
+        let path = path.split("/").into_iter().collect::<Vec<&str>>();
+
+        let initial_path = path.get(1).unwrap();
+        let initial_path = if initial_path.is_empty() {
+            "/"
+        } else {
+            initial_path
+        };
+
+        match initial_path {
             "/" => Route::Root,
+            "echo" => {
+                let echo = path.get(2);
+
+                if let Some(message) = echo {
+                    return Route::Echo(String::from(*message));
+                }
+
+                Route::NotFound
+            }
             _ => Route::NotFound,
         }
     }
@@ -47,6 +66,7 @@ pub fn router(buf: &[u8]) -> Result<HttpStatus, HttpStatusErr> {
 
     match route {
         Route::Root => Ok(HttpStatus::Ok),
+        Route::Echo(value) => Ok(HttpStatus::OkWithMessage(value)),
         Route::NotFound => Err(HttpStatusErr::NotFound),
     }
 }

@@ -3,6 +3,7 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub enum HttpStatus {
     Ok,
+    OkWithMessage(String),
     NotFound,
 }
 
@@ -21,13 +22,15 @@ impl Display for HttpStatusErr {
 }
 
 const PREFIX_RESPONSE: &str = "HTTP/1.1";
-const BREAK_LINE: &str = "\r\n\r\n";
+const BREAK_LINE: &str = "\r\n";
+const DOUBLE_BREAK_LINE: &str = "\r\n\r\n";
 
 impl HttpStatus {
     pub fn get_response(&self) -> String {
         match self {
-            Self::Ok => format!("{PREFIX_RESPONSE} 200 OK{BREAK_LINE}"),
-            Self::NotFound => format!("{PREFIX_RESPONSE} 404 Not Found{BREAK_LINE}"),
+            Self::Ok => format!("{PREFIX_RESPONSE} 200 OK{DOUBLE_BREAK_LINE}"),
+            Self::OkWithMessage(value) => format!("{PREFIX_RESPONSE} 200 OK{BREAK_LINE}Content-Type: text/plain{BREAK_LINE}Content-Length: {}{DOUBLE_BREAK_LINE}{value}", value.len()),
+            Self::NotFound => format!("{PREFIX_RESPONSE} 404 Not Found{DOUBLE_BREAK_LINE}"),
         }
     }
 }
