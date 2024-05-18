@@ -62,9 +62,13 @@ impl Route {
                 let folder = args.last().unwrap_or(String::from("./")); 
 
                 if let Some(path) = file {
-                    let file = fs::read_to_string(format!("{folder}{path}")).unwrap();
-                    dbg!("the actual content", &file);
-                    return Route::Files(file);
+                    let file = fs::read_to_string(format!("{folder}{path}"));
+
+                    if file.is_err() {
+                        return Route::NotFound;
+                    }
+
+                    return Route::Files(file.expect("shouldn't throw!"));
                 }
 
                 Route::NotFound
