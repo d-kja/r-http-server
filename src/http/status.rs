@@ -4,7 +4,7 @@ use std::fmt::{Display, Formatter};
 pub enum HttpStatus {
     Ok,
     OkWithMessage(String),
-    OkWithFile(Vec<u8>),
+    OkWithFile(String),
     NotFound,
 }
 

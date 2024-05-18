@@ -6,7 +6,7 @@ enum Route {
     Root,
     Echo(String),
     UserAgent(String),
-    Files(Vec<u8>),
+    Files(String),
     NotFound,
 }
 
@@ -62,7 +62,7 @@ impl Route {
                 let folder = args.last().unwrap_or(String::from("./")); 
 
                 if let Some(path) = file {
-                    let file = fs::read(format!("{folder}{path}")).expect("unable to read file");
+                    let file = fs::read_to_string(format!("{folder}{path}")).expect("unable to read file");
                     return Route::Files(file);
                 }
 
