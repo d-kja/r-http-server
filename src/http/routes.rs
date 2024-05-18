@@ -1,3 +1,5 @@
+use std::fs;
+
 use super::status::{HttpStatus, HttpStatusErr};
 
 enum Route {
@@ -54,7 +56,14 @@ impl Route {
                 Route::UserAgent(user_agent.to_string())
             },
             "files" => {
-                Route::Files(vec![])
+                let file = path.get(2);
+
+                if let Some(path) = file {
+                    let file = fs::read(path).expect("unable to read file");
+                    return Route::Files(file);
+                }
+
+                Route::NotFound
             }
             _ => Route::NotFound,
         }
