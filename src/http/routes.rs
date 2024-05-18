@@ -4,9 +4,9 @@ enum Route {
     Root,
     Echo(String),
     UserAgent(String),
+    Files(Vec<u8>),
     NotFound,
 }
-
 
 impl Route {
     pub fn get_from_request(parsed_buffer: &Vec<String>) -> Self {
@@ -15,6 +15,9 @@ impl Route {
             .unwrap()
             .split_whitespace()
             .collect::<Vec<&str>>();
+
+
+        dbg!("DEBUG:", &parsed_buffer);
 
         // let method = *request.get(0).unwrap();
         let path = *request.get(1).unwrap();
@@ -49,6 +52,9 @@ impl Route {
                 let user_agent = user_agent.get(1).expect("user agent not found");
 
                 Route::UserAgent(user_agent.to_string())
+            },
+            "files" => {
+                Route::Files(vec![])
             }
             _ => Route::NotFound,
         }
@@ -81,6 +87,7 @@ pub fn router(buf: &[u8]) -> Result<HttpStatus, HttpStatusErr> {
         Route::Root => Ok(HttpStatus::Ok),
         Route::Echo(value) => Ok(HttpStatus::OkWithMessage(value)),
         Route::UserAgent(value)=> Ok(HttpStatus::OkWithMessage(value)),
+        Route::Files(value)=> Ok(HttpStatus::OkWithFile(value)),
         Route::NotFound => Err(HttpStatusErr::NotFound),
     }
 }
