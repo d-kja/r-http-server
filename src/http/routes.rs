@@ -59,10 +59,10 @@ impl Route {
                 let file = path.get(2);
                 let args = env::args();
 
-                dbg!(args);
+                let folder = args.last().unwrap_or(String::from("./")); 
 
                 if let Some(path) = file {
-                    let file = fs::read(path).expect("unable to read file");
+                    let file = fs::read(format!("{folder}{path}")).expect("unable to read file");
                     return Route::Files(file);
                 }
 
