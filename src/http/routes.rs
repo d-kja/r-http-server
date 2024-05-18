@@ -17,17 +17,6 @@ impl Route {
             .collect::<Vec<&str>>();
 
         // let method = *request.get(0).unwrap();
-
-        dbg!(&parsed_buffer);
-        // Well... my curl has a Accept header =D
-        let user_agent = if parsed_buffer.get(2).expect("second header not found").starts_with("Accept:") {
-            parsed_buffer.get(3).expect("third header not found").split(": ").collect::<Vec<&str>>()
-        } else {
-            parsed_buffer.get(2).expect("second header not found").split(": ").collect::<Vec<&str>>()
-        };
-
-        let user_agent = user_agent.get(1).expect("user agent not found");
-
         let path = *request.get(1).unwrap();
         let path = path.split("/").into_iter().collect::<Vec<&str>>();
 
@@ -49,7 +38,18 @@ impl Route {
 
                 Route::NotFound
             },
-            "user-agent" => Route::UserAgent(user_agent.to_string()),
+            "user-agent" => {
+                // Well... my curl has a Accept header =D
+                let user_agent = if parsed_buffer.get(2).expect("second header not found").starts_with("Accept:") {
+                    parsed_buffer.get(3).expect("third header not found").split(": ").collect::<Vec<&str>>()
+                } else {
+                    parsed_buffer.get(2).expect("second header not found").split(": ").collect::<Vec<&str>>()
+                };
+
+                let user_agent = user_agent.get(1).expect("user agent not found");
+
+                Route::UserAgent(user_agent.to_string())
+            }
             _ => Route::NotFound,
         }
     }
