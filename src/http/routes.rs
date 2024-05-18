@@ -6,7 +6,8 @@ enum Route {
     Root,
     Echo(String),
     UserAgent(String),
-    Files(String),
+    FileWrite,
+    FileRead(String),
     NotFound,
 }
 
@@ -71,10 +72,25 @@ impl Route {
                                 return Route::NotFound;
                             }
 
-                            Route::Files(file.expect("shouldn't throw!"))
+                            Route::FileRead(file.expect("shouldn't throw!"))
                         },
                         "POST" => {
-                            Route::NotFound
+                            let content = parsed_buffer.get(3).unwrap();
+
+                            let file = fs::write(format!("{folder}{path}"), content); 
+
+                            if let Err(error) = file {
+                                match error.kind() {
+                                    std::io::ErrorKind::NotFound => {
+                                        return Route::NotFound
+                                    }
+                                    _ => panic!("unable to open file")
+                                }
+                            }
+
+                            file.expect("unable to write to file");
+
+                            Route::FileWrite
                         },
                         _ => Route::NotFound
                     }
@@ -113,7 +129,8 @@ pub fn router(buf: &[u8]) -> Result<HttpStatus, HttpStatusErr> {
         Route::Root => Ok(HttpStatus::Ok),
         Route::Echo(value) => Ok(HttpStatus::OkWithMessage(value)),
         Route::UserAgent(value)=> Ok(HttpStatus::OkWithMessage(value)),
-        Route::Files(value)=> Ok(HttpStatus::OkWithFile(value)),
+        Route::FileRead(value)=> Ok(HttpStatus::OkWithFileRead(value)),
+        Route::FileWrite=> Ok(HttpStatus::OkWithFileWrite),
         Route::NotFound => Err(HttpStatusErr::NotFound),
     }
 }

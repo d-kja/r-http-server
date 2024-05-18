@@ -4,7 +4,8 @@ use std::fmt::{Display, Formatter};
 pub enum HttpStatus {
     Ok,
     OkWithMessage(String),
-    OkWithFile(String),
+    OkWithFileRead(String),
+        OkWithFileWrite,
     NotFound,
 }
 
@@ -31,7 +32,8 @@ impl HttpStatus {
         match self {
             Self::Ok => format!("{PREFIX_RESPONSE} 200 OK{DOUBLE_BREAK_LINE}"),
             Self::OkWithMessage(value) => format!("{PREFIX_RESPONSE} 200 OK{BREAK_LINE}Content-Type: text/plain{BREAK_LINE}Content-Length: {}{DOUBLE_BREAK_LINE}{value}", value.len()),
-            Self::OkWithFile(value) => format!("{PREFIX_RESPONSE} 200 OK{BREAK_LINE}Content-Type: application/octet-stream{BREAK_LINE}Content-Length: {}{DOUBLE_BREAK_LINE}{value}", value.len()),
+            Self::OkWithFileRead(value) => format!("{PREFIX_RESPONSE} 200 OK{BREAK_LINE}Content-Type: application/octet-stream{BREAK_LINE}Content-Length: {}{DOUBLE_BREAK_LINE}{value}", value.len()),
+            Self::OkWithFileWrite => format!("{PREFIX_RESPONSE} 201 CREATED{DOUBLE_BREAK_LINE}"),
             Self::NotFound => format!("{PREFIX_RESPONSE} 404 Not Found{DOUBLE_BREAK_LINE}"),
         }
     }
