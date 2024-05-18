@@ -21,7 +21,8 @@ impl Route {
 
         dbg!("DEBUG:", &parsed_buffer);
 
-        // let method = *request.get(0).unwrap();
+        let method = *request.get(0).unwrap();
+
         let path = *request.get(1).unwrap();
         let path = path.split("/").into_iter().collect::<Vec<&str>>();
 
@@ -62,13 +63,21 @@ impl Route {
                 let folder = args.last().unwrap_or(String::from("./")); 
 
                 if let Some(path) = file {
-                    let file = fs::read_to_string(format!("{folder}{path}"));
+                    return match method {
+                        "GET" => {
+                            let file = fs::read_to_string(format!("{folder}{path}"));
 
-                    if file.is_err() {
-                        return Route::NotFound;
+                            if file.is_err() {
+                                return Route::NotFound;
+                            }
+
+                            Route::Files(file.expect("shouldn't throw!"))
+                        },
+                        "POST" => {
+                            Route::NotFound
+                        },
+                        _ => Route::NotFound
                     }
-
-                    return Route::Files(file.expect("shouldn't throw!"));
                 }
 
                 Route::NotFound
