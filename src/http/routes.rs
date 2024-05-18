@@ -63,6 +63,7 @@ impl Route {
 
                 if let Some(path) = file {
                     let file = fs::read_to_string(format!("{folder}{path}")).expect("unable to read file");
+                    dbg!("the actual content", &file);
                     return Route::Files(file);
                 }
 
