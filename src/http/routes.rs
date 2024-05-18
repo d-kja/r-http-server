@@ -1,4 +1,4 @@
-use std::fs;
+use std::{env, fs};
 
 use super::status::{HttpStatus, HttpStatusErr};
 
@@ -57,6 +57,9 @@ impl Route {
             },
             "files" => {
                 let file = path.get(2);
+                let args = env::args();
+
+                dbg!(args);
 
                 if let Some(path) = file {
                     let file = fs::read(path).expect("unable to read file");
