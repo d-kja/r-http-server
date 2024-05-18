@@ -17,7 +17,7 @@ impl Route {
             .collect::<Vec<&str>>();
 
         // let method = *request.get(0).unwrap();
-
+        dbg!(&parsed_buffer);
         let user_agent = parsed_buffer.get(3).unwrap().split(": ").collect::<Vec<&str>>();
         let user_agent = user_agent.get(1).unwrap();
 
