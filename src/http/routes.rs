@@ -62,7 +62,7 @@ impl Route {
                 let folder = args.last().unwrap_or(String::from("./")); 
 
                 if let Some(path) = file {
-                    let file = fs::read_to_string(format!("{folder}{path}")).expect("unable to read file");
+                    let file = fs::read_to_string(format!("{folder}{path}")).unwrap();
                     dbg!("the actual content", &file);
                     return Route::Files(file);
                 }
