@@ -10,15 +10,10 @@ const PORT: &str = "4221";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ip_address = format!("{ADDRESS}:{PORT}");
     let listener = TcpListener::bind(ip_address).unwrap();
-    let mut handlers = Vec::new();
 
     println!("HTTP Server started");
 
-    handle_incoming_request(&listener, &mut handlers)?;
-
-    for handler in handlers {
-        handler.join().unwrap();
-    }
+    handle_incoming_request(&listener)?;
 
     Ok(())
 }

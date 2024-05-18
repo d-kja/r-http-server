@@ -3,22 +3,22 @@ use std::{
     net::TcpListener,
     ops::DerefMut,
     sync::{Arc, Mutex},
-    thread::{self, JoinHandle},
+    thread::{self},
 };
 
 use super::routes::router;
 
 pub fn handle_incoming_request(
     listener: &TcpListener,
-    handlers: &mut Vec<JoinHandle<()>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     for stream in listener.incoming() {
         let stream = Arc::new(Mutex::new(stream?));
-
         let stream_clone = stream.clone();
 
         // can cause thread overflow, it's better to use a thread pool
-        let handle = thread::spawn(move || {
+        // and... it needs to do the actual thread clean up 
+        // so please don't repeat this at home kids...
+        thread::spawn(move || {
             let mut stream = stream_clone.lock().unwrap();
             let stream = stream.deref_mut();
 
@@ -39,8 +39,6 @@ pub fn handle_incoming_request(
             stream.write(response.as_bytes()).unwrap();
             stream.flush().unwrap();
         });
-
-        handlers.push(handle);
     }
 
     Ok(())
