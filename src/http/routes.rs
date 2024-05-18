@@ -17,8 +17,13 @@ impl Route {
             .collect::<Vec<&str>>();
 
         // let method = *request.get(0).unwrap();
-        dbg!(&parsed_buffer);
-        let user_agent = parsed_buffer.get(3).unwrap().split(": ").collect::<Vec<&str>>();
+
+        // Well... my curl has a Accept header =D
+        let user_agent = if parsed_buffer.get(2).unwrap().starts_with("Accept:") {
+            parsed_buffer.get(3).unwrap().split(": ").collect::<Vec<&str>>()
+        } else {
+            parsed_buffer.get(2).unwrap().split(": ").collect::<Vec<&str>>()
+        };
         let user_agent = user_agent.get(1).unwrap();
 
         let path = *request.get(1).unwrap();
